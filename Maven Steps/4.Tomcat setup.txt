@@ -1,0 +1,60 @@
+Tomcat Setup on ec2 Redhat t2.medium
+===================================
+
+Java Installation
+-----------------
+
+##Login as a root user
+sudo su -
+
+##Change dir to /opt 
+cd /opt
+yum install wget -y
+wget -c --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm
+yum install jdk-8u131-linux-x64.rpm -y
+
+java -version
+
+Tomcat Installation
+----------------------
+#Login as a root user
+sudo su -
+cd /opt
+yum install wget unzip -y
+
+wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.62/bin/apache-tomcat-9.0.62.zip
+
+unzip apache-tomcat-9.0.62.zip
+cd /opt/apache-tomcat-9.0.62/bin
+chmod u+x *.sh
+sh /opt/apache-tomcat-9.0.62/bin/startup.sh
+ln -s /opt/apache-tomcat-9.062/bin/startup.sh /usr/bin/startTomcat
+ln -s /opt/apache-tomcat-9.0.62/bin/shutdown.sh /usr/bin/stopTomcat
+#ps -fax | grep tomcat
+
+startTomcat
+#stopTomcat
+
+ps -ef | grep tomcat
+
+
+================================
+
+verify the tomcat in browser:
+
+publicip:8080 
+
+Add 8080 in security group
+
+
+For Jenkins Deployment
+=======================
+# vi /opt/apache-tomcat-9.0.56/webapps/manager/META-INF/context.xml
+#Comment the below lines
+#<!-- <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+# allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" /> -->
+uncomment the valve
+<!--  <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+         allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" />
+-->
+

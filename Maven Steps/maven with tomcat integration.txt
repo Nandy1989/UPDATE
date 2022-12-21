@@ -1,0 +1,106 @@
+Install java on redhat
+===================
+$ sudo yum install java-11-openjdk -y
+$ java -version
+install maven on redhat 
+$ sudo su -
+$ cd /usr/local/src
+$wget https://dlcdn.apache.org/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.tar.gz
+$ tar -xf apache-maven-3.8.5-bin.tar.gz
+ $ mv apache-maven-3.8.5 apache-maven
+ $ rm -rf apache-maven-3.8.5-bin.tar.gz
+
+Each of these contain a bin/java
+
+To find the full path of the symbolic link use:
+
+readlink -f $(which java)
+
+ ## Configure Apache-Maven and JAVA Environment
+ 
+ Go to the '/etc/profile.d' directory
+ and create a new configuration file 'maven.sh'.
+ 
+ $ cd /etc/profile.d/
+ $ vim maven.sh
+ #Add below lines
+
+# MAVEN_HOME for Maven 1 - M2_HOME for Maven 2
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.15.0.10-2.el8_6.x86_64
+export M2_HOME=/usr/local/src/apache-maven
+export MAVEN_HOME=/usr/local/src/apache-maven
+export PATH=${M2_HOME}/bin:${PATH}
+
+ ESC+ :wq
+ ## Save the file and make it executable.
+ 
+ $ chmod +x maven.sh
+
+Run the File:
+
+ $ source maven.sh
+ 
+ ## Verify the maven version
+ 
+  mvn --version
+
+Generate MAVEN webapp
+========================
+mvn archetype:generate -DarchetypeGroupId=org.apache.maven.archetypes -DarchetypeArtifactId=maven-archetype-webapp  -DarchetypeVersion=1.0 -DgroupId=com.maventest -DartifactId=mywebtest  -Dversion=1.0-SNAPSHOT
+
+Adding Tomcat Maven Plugin
+==========================
+There are other plugins tomcat8-maven-plugin and tomcat9-maven-plugin available in the maven repository 
+
+ cd mywebtest/
+   
+ vi pom.xml
+
+Edit project’s pom.xml file and plugin entry inside build tag.
+
+<build>
+
+Add below code under <build>
+----------------------------------
+
+<build>
+    <finalName>mywebtest</finalName>
+     <plugins>
+        <plugin>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>2.3</version>
+        </plugin>
+        <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.1</version>
+            <configuration>
+                <source>1.7</source>
+                <target>1.7</target>
+            </configuration>
+        </plugin>
+        <plugin>
+        <groupId>org.apache.tomcat.maven</groupId>
+        <artifactId>tomcat7-maven-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+            <url>http://54.91.173.216:8080/manager</url>
+            <server>ec2-54-91-173-216.compute-1.amazonaws.com</server>
+            <path>/${project.build.finalName}</path>
+        </configuration>
+        </plugin>
+    </plugins>
+  </build>
+===
+
+Execute maven command: 
+
+mvn tomcat7:run
+
+check in browser
+http://54.91.173.216:8080/mywebtest/
+
+hello world
+
+
+
+

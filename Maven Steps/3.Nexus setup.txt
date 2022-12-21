@@ -1,0 +1,95 @@
+Nexus setup on ec2 Redhat t2.medium  port: 8081
+------------------------------------
+Java Installation
+-------------------
+
+##Login as a root user
+sudo su -
+
+##Change dir to /opt 
+$ cd /opt
+$ yum install wget -y
+
+$ wget -c --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm
+
+$ yum install jdk-8u131-linux-x64.rpm -y
+
+java -version
+
+$ wget http://www.sonatype.org/downloads/nexus-latest-bundle.tar.gz 
+$ sudo cp nexus-latest-bundle.tar.gz /usr/local/ 
+$ cd /usr/local
+$ sudo tar xvzf nexus-latest-bundle.tar.gz 
+$ cd  nexus-2.14
+$ export RUN_AS_USER=root
+$ bin/nexus start
+
+ip:8081/nexus to see the page
+
+/nexus is the context for nexus.
+
+login with admin/admin123.
+
+
+Nexus Installation in another way;
+---------------------==============
+
+sudo su -
+cd /opt
+yum install tar wget -y
+#wget https://download.sonatype.com/nexus/3/nexus-3.29.2-02-unix.tar.gz
+wget https://download.sonatype.com/nexus/3/nexus-3.28.1-01-unix.tar.gz
+tar -zxvf nexus-3.28.1-01-unix.tar.gz
+mv nexus-3.28.1-01 nexus
+useradd nexus
+
+visudo
+nexus   ALL=(ALL)       NOPASSWD: ALL
+
+#Change the owner and group permissions to /opt/nexus and /opt/sonatype-work directories.
+
+chown -R nexus:nexus /opt/nexus
+chown -R nexus:nexus /opt/sonatype-work
+chmod -R 775 /opt/nexus
+chmod -R 775 /opt/sonatype-work
+
+ls
+cd nexus
+cd bin/
+ls
+vi nexus.rc ----> un comment & edit username like nexus
+(or)
+vi /opt/nexus/bin/nexus.rc
+run_as_user="nexus"
+
+#Create nexus as a service
+
+ln -s /opt/nexus/bin/nexus /etc/init.d/nexus
+
+#Switch as a nexus user and start the nexus service as follows.
+
+su - nexus
+
+#Enable the nexus services
+sudo systemctl enable nexus
+
+#Start the nexus service
+sudo systemctl start nexus
+
+sudo systemctl status nexus
+
+
+
+#Access the Nexus server from Laptop/Desktop browser.
+ 
+http://IPAddess/Hostname:8081/nexus
+
+#Default Credentials
+User Name: admin
+path : cat /opt/sonatype-work/nexus3/admin.password
+Password: cat <Path>
+or
+Password: admin123
+select enable anonymonous user
+
+

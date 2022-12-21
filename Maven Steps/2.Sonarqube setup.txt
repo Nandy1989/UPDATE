@@ -1,0 +1,84 @@
+Project Flow without docker:-
+=========================
+Sonarqube setup on ec2 Redhat t2.medium
+=========
+Take ec2 Redhat t2.medium type  for setting up Sonarqube on Ec2.
+
+Sonarqube works on port no : 9000
+
+add 9000 to security group.
+
+Java Installation
+------------------
+##Login as a root user
+sudo su -
+
+##Change dir to /opt 
+
+$ cd /opt
+
+$ yum install wget -y
+
+$ wget -c --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm
+
+$ yum install jdk-8u131-linux-x64.rpm -y
+
+$ java -version
+
+
+Sonarqube Installation
+----------------------
+#Login as a root user.
+sudo su -
+
+#Download the SonarqQube Server software.
+cd /opt
+yum install unzip -y
+wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-7.8.zip
+unzip sonarqube-7.8.zip
+useradd sonar
+visudo
+sonar   ALL=(ALL)       NOPASSWD: ALL
+
+#Change the owner and group permissions to /opt/sonarqube-7.8/ directory.
+chown -R sonar:sonar /opt/sonarqube-7.8/
+chmod -R 775 /opt/sonarqube-7.8/
+su - sonar
+
+cd /opt/sonarqube-7.8/bin/linux-x86-64/
+
+./sonar.sh start
+./sonar.sh status
+
+#Access the sonarqube server from Laptop/Desktop browser.
+ 
+http://IPAddess/Hostname:9000/
+
+#Default Credentials
+User Name: admin
+Password: admin
+
+If incase your sonar server is stopped & start---->your sonar server is not running---> so inthat case pls follow below steps
+
+[ec2-user@ip-172-31-65-10 ~]$ sudo su -
+
+[root@ip-172-31-65-10 ~]# cd /opt/sonarqube-7.8/bin/linux-x86-64/
+[root@ip-172-31-65-10 linux-x86-64]# su - sonar
+
+[sonar@ip-172-31-65-10 ~]$ cd /opt/sonarqube-7.8/bin/linux-x86-64/
+[sonar@ip-172-31-65-10 logs]$ sudo rm -rf /opt/sonarqube-7.8/temp/
+[sonar@ip-172-31-65-10 logs]$ cd ../bin/linux-x86-64/
+[sonar@ip-172-31-65-10 linux-x86-64]$ ./sonar.sh start
+Starting SonarQube...
+Started SonarQube.
+[sonar@ip-172-31-65-10 linux-x86-64]$ ./sonar.sh status
+SonarQube is running (1466).
+[sonar@ip-172-31-65-10 linux-x86-64]$
+
+publicip:8080
+========================================================================================
+mvn sonar:sonar \
+  -Dsonar.projectKey=mavenproj \
+  -Dsonar.host.url=http://18.222.205.164:9000 \
+  -Dsonar.login=c46c2cd4cf618ef4b4c20475f5b324a7c9a0adf7
+

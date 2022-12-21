@@ -1,0 +1,107 @@
+install maven
+
+install nexus
+
+mkdir testproject
+cd testproject
+
+mvn archetype:generate -DarchetypeGroupId=org.apache.maven.archetypes -DarchetypeArtifactId=maven-archetype-webapp  -DarchetypeVersion=1.0 -DgroupId=com.maventest -DartifactId=mywebtest  -Dversion=1.0-SNAPSHOT
+
+
+Configuring Nexus as a Maven repo
+What we will do:
+– create a private (hosted) repository for our snapshots
+– create a private (hosted) repository for our releases
+– create a proxy repository pointing to Maven Central
+– create a group repository to provide all of these repos under a single URL
+
+snapshots repo
+A repository for Maven artifacts that you deploy with -SNAPSHOT in the end of the version tag of your pom.xml:
+<version>1.0.0-SNAPSHOT</version>
+releases repo
+A repository for Maven artifact that you deploy without -SNAPSHOT in the end of the version tag of your pom.xml:
+
+<version>1.0.0</version>
+
+proxy to Maven Central repo
+A repository that proxies everything you download from Maven Central. Next time you download the same dependency, it will be cached in your Nexus.
+
+group repo
+This will group all the above repos and provide you a single URL to configure your clients to download from/deploy to.
+
+
+Configuring your clients and projects to use your Nexus repos:
+==========================================================
+conf/settings.xml in maven installation folder
+=============
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.1.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
+
+  <servers>
+    <server>
+      <id>nexus-snapshots</id>
+      <username>admin</username>
+      <password>admin123</password>
+    </server>
+    <server>
+      <id>nexus-releases</id>
+      <username>admin</username>
+      <password>admin123</password>
+    </server>
+  </servers>
+</settings>
+
+====
+ configure your projects in pom.xml
+=================================
+If you want only to download dependencies from Nexus, put this in the pom.xml:
+
+<project ...>
+
+  ...
+
+  <repositories>
+    <repository>
+      <id>maven-group</id>
+      <url>http://your-host:8081/repository/maven-group/</url>
+    </repository>
+  </repositories>
+</project>
+And if you want also to publish your project, add:
+
+<project ...>
+
+  ...
+change ids and urls
+==================
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>nexus-snapshots</id>
+      <url>http://3.91.214.9:8081/repository/nexus-snapshots/</url>
+    </snapshotRepository>
+    <repository>
+      <id>nexus-releases</id>
+      <url>http://3.91.214.9:8081/repository/nexus-releases/</url>
+    </repository>
+  </distributionManagement>
+</project>
+Now if you run in your projects:
+
+mvn install
+# or
+mvn deploy
+your mvn will point to your Nexus instance.
+
+change 2.0 in pom.xml stores in released
+change 2.0-SNAPSHOT storeds in snapshot
+
+
+<dependency>
+  <groupId>com.projecttest</groupId>
+  <artifactId>mywebtest</artifactId>
+  <version>4.0.0</version>
+  <type>war</type>
+</dependency>
